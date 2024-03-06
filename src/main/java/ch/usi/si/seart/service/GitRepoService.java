@@ -15,6 +15,7 @@ import org.springframework.dao.TransientDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -22,20 +23,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.Tuple;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Tuple;
 import java.util.stream.Stream;
 
 public interface GitRepoService {
 
     @Retryable(
-            value = TransientDataAccessException.class,
+            retryFor = TransientDataAccessException.class,
             backoff = @Backoff(delay = 250, multiplier = 2),
             maxAttempts = 5
     )
     void deleteRepoById(Long id);
     @Retryable(
-            value = TransientDataAccessException.class,
+            retryFor = TransientDataAccessException.class,
             backoff = @Backoff(delay = 250, multiplier = 2),
             maxAttempts = 5
     )
@@ -46,7 +47,7 @@ public interface GitRepoService {
     GitRepo getById(Long id);
     GitRepo getByName(String name);
     @Retryable(
-            value = TransientDataAccessException.class,
+            retryFor = TransientDataAccessException.class,
             backoff = @Backoff(delay = 250, multiplier = 2),
             maxAttempts = 5
     )
@@ -123,7 +124,7 @@ public interface GitRepoService {
 
         @Override
         public Stream<GitRepo> streamBy(Specification<GitRepo> specification) {
-            return gitRepoRepository.streamAll(specification);
+            return gitRepoRepository.findBy(specification, FluentQuery.FetchableFluentQuery::stream);
         }
 
         @Override

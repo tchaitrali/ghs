@@ -5,7 +5,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.stream.Collectors;

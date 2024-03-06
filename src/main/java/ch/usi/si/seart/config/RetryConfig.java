@@ -13,6 +13,8 @@ import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
+import java.time.Duration;
+
 @Configuration
 @EnableRetry
 public class RetryConfig {
@@ -24,17 +26,6 @@ public class RetryConfig {
             private final Logger log = LoggerFactory.getLogger(
                     RetryConfig.class.getCanonicalName() + "$" + RetryListener.class.getSimpleName()
             );
-
-            @Override
-            public <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback) {
-                return true;
-            }
-
-            @Override
-            public <T, E extends Throwable> void close(
-                    RetryContext context, RetryCallback<T, E> callback, Throwable throwable
-            ) {
-            }
 
             @Override
             public <T, E extends Throwable> void onError(
@@ -63,7 +54,7 @@ public class RetryConfig {
     @Bean
     public RetryTemplate timeLimitedRetryTemplate(BackOffPolicy backOffPolicy) {
         return RetryTemplate.builder()
-                .withinMillis(7_200_000)
+                .withTimeout(Duration.ofHours(2))
                 .customBackoff(backOffPolicy)
                 .retryOn(Exception.class)
                 .build();
